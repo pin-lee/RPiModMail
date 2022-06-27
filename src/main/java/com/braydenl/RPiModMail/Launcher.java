@@ -15,7 +15,6 @@ public class Launcher  {
     static Bot bot = new Bot();
 
     public static void main(String[] args) {
-        System.out.println("Hello, world!");
         try {
             String TOKEN = args[0];
             GatewayIntent[] intents = {
@@ -24,7 +23,7 @@ public class Launcher  {
             };
             jda = JDABuilder.createLight(TOKEN, Arrays.asList(intents))
                     .addEventListeners(bot)
-                    .setActivity(Activity.watching("Direct Messages and you!"))
+                    .setActivity(Activity.watching("for tickets..."))
                     .build()
                     .awaitReady();
             bot.configure(jda);

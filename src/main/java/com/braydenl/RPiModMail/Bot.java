@@ -34,6 +34,17 @@ public class Bot extends ListenerAdapter {
         if (author.isBot()) return;
         String content = msg.getContentRaw();
 
+        if (msg.getChannel().equals(modMail) && content.equals("!maintenance")) {
+            // send a message to all users in usersAndTickets
+                for (User user : usersAndTickets.keySet()) {
+                        user.openPrivateChannel().queue(channel -> channel.sendMessage("The bot is going down for maintenance. " +
+                                "All currently cached tickets will be lost. Please reopen your ticket once the bot is back up. " +
+                                "If the issue is urgent, please ping and/or direct-message an online moderator.").queue());
+                }
+                System.out.println("Sent maintenance message to all users. Shutting down.");
+                return;
+        }
+
         if (content.equals("ticket") || content.equals("modmail")) {
             if (msg.isFromGuild()) {
                 author.openPrivateChannel().flatMap(channel -> channel.sendMessage("Use `ticket` to create a new ticket!")).queue();
@@ -49,6 +60,7 @@ public class Bot extends ListenerAdapter {
 
         if (!msg.isFromGuild() && content.equals("ticket complete") && usersAndTickets.containsKey(author) && !usersAndTickets.get(author).isEmpty()) {
             modMail.sendMessage("**NEW MOD MAIL -> [ticket " + ticketNumber + "]**\nUser: <@" + author.getId() + ">\n" + usersAndTickets.get(author)).queue();
+            msg.reply("Ticket sent!").queue();
             usersAndTickets.remove(author);
             ticketNumber++;
             return;
@@ -65,7 +77,7 @@ public class Bot extends ListenerAdapter {
                         Use `ticket` to create a new ticket.
                         Use `ticket complete` to close the ticket and send it off to the mod team.
                         Use `ticket cancel` to cancel the ticket.
-                        *P.S. This help dialogue does not show up in the ticket, so don't worry!*"""
+                        *P.S. This help dialogue does not show up in the ticket, so don't worry! *"""
                         )).queue();
                 return;
         }
@@ -81,5 +93,4 @@ public class Bot extends ListenerAdapter {
             } catch (Exception ignored) {}
         }
     }
-
 }
